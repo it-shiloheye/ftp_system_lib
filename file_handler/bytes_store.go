@@ -20,7 +20,7 @@ func (bs *BytesStore) Hash() (hash string, err error) {
 	bs.h.Reset()
 	_, err = io.Copy(bs.h, &bs.Buffer)
 	if err != nil {
-		err = ftp_context.NewLogItem(loc, true).Set("after", "io.Copy").AppendParentError(err)
+		err = ftp_context.NewLogItem(loc, true).SetAfter("io.Copy").AppendParentError(err)
 		return
 	}
 	hash = fmt.Sprintf("%x", bs.h.Sum(nil))

@@ -60,7 +60,7 @@ func (gte *GitEngine) dir_commit(directory string) (err error) {
 	if !is_repo {
 		if err_pre := gte.git_init(ctx, directory); err_pre != nil {
 			err = ftp_context.NewLogItem(loc, true).
-				Set("after", "git_init").AppendParentError(err_pre)
+				SetAfter("git_init").AppendParentError(err_pre)
 
 			return
 		}
@@ -71,7 +71,7 @@ func (gte *GitEngine) dir_commit(directory string) (err error) {
 	if !has_gitignore {
 		if err_pre := gte.git_add_gitignore(ctx, directory); err_pre != nil {
 			err = ftp_context.NewLogItem(loc, true).
-				Set("after", "git_add_gitignore").AppendParentError(err_pre)
+				SetAfter("git_add_gitignore").AppendParentError(err_pre)
 
 			return
 		}
@@ -80,7 +80,7 @@ func (gte *GitEngine) dir_commit(directory string) (err error) {
 
 	if err_pre := gte.git_add(ctx, directory); err_pre != nil {
 		err = ftp_context.NewLogItem(loc, true).
-			Set("after", "git_add").AppendParentError(err_pre)
+			SetAfter("git_add").AppendParentError(err_pre)
 
 		return
 	}
@@ -89,7 +89,7 @@ func (gte *GitEngine) dir_commit(directory string) (err error) {
 	pre := gte.git_commit(ctx, directory)
 	if pre != nil {
 		err = ftp_context.NewLogItem(loc, true).
-			Set("after", "git_commit").
+			SetAfter("git_commit").
 			Set("path", directory).
 			AppendParentError(pre)
 
@@ -140,7 +140,7 @@ func (gte *GitEngine) git_add(ctx ftp_context.Context, directory string) (err er
 	loc := "git_add"
 	if err_post := os.Remove(directory + "/.git/index.lock"); err_post != nil && !errors.Is(err_post, os.ErrNotExist) {
 		err = ftp_context.NewLogItem(loc, true).
-			Set("after", "os.Remove").
+			SetAfter("os.Remove").
 			AppendParentError(err_post, err)
 		return
 	}
@@ -148,7 +148,7 @@ func (gte *GitEngine) git_add(ctx ftp_context.Context, directory string) (err er
 	o, stderr, err := execute_commit_step(ctx, directory, []string{"add", "."})
 	if err != nil {
 		err = ftp_context.NewLogItem(loc, true).
-			Set("after", "execute_commit_step").
+			SetAfter("execute_commit_step").
 			Set("std_err", stderr).
 			Set("std_out", o).
 			AppendParentError(err)

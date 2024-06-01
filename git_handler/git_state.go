@@ -83,7 +83,7 @@ func (g *GitStateStruct) hash_engine(ctx ftp_context.Context) (err_c <-chan ftp_
 					b.Reset()
 					_, err := b.ReadFrom(f)
 					if err != nil {
-						err_ <- ftp_context.NewLogItem(loc, true).Set("after", "BytesStore.ReadFrom(FileHash)").AppendParentError(err)
+						err_ <- ftp_context.NewLogItem(loc, true).SetAfter("BytesStore.ReadFrom(FileHash)").AppendParentError(err)
 
 						g.FileTree.EnqueueHashing(f)
 						g.buffer_store <- b
@@ -91,7 +91,7 @@ func (g *GitStateStruct) hash_engine(ctx ftp_context.Context) (err_c <-chan ftp_
 					}
 					f.Hash, err = b.Hash()
 					if err != nil {
-						err_ <- ftp_context.NewLogItem(loc, true).Set("after", "BytesStore.Hash").AppendParentError(err)
+						err_ <- ftp_context.NewLogItem(loc, true).SetAfter("BytesStore.Hash").AppendParentError(err)
 
 						g.FileTree.EnqueueHashing(f)
 						g.buffer_store <- b

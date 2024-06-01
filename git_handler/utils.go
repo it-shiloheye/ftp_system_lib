@@ -36,7 +36,7 @@ func set_stderr(ctx ftp_context.Context, loc string, stderr string, err error) (
 	cc := "std_err"
 	cmp_err = ftp_context.NewLogItem("ExecuteCommand", true).
 		AppendParentError(err).
-		Set("after", loc).
+		SetAfter(loc).
 		Set("stderr", strings_split(string(stderr), "\n")).
 		AppendParentError(err)
 
@@ -103,7 +103,7 @@ func ExecuteCommand(ctx ftp_context.Context, dir string, command string, arg ...
 		msg := err.Error()
 		err = ftp_context.NewLogItem(loc, true).
 			AppendParentError(err_).
-			Set("after", "cmd.Start()").
+			SetAfter("cmd.Start()").
 			Set("error_msg", msg).
 			SetMessage("")
 		cmd.Cancel()

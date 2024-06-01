@@ -27,7 +27,7 @@ func (fo *FileBasic) Read(buf []byte) (n int, err error) {
 	n, err = io.ReadFull(fo.fo, buf)
 	if err != nil {
 		fo.Err = ftp_context.NewLogItem("FileBasic.Read", true).
-			Set("after", "io.ReadFull").
+			SetAfter("io.ReadFull").
 			Set("path", fo.Path).AppendParentError(err)
 		return n, fo.Err
 	}
@@ -54,7 +54,7 @@ func (fo *FileBasic) Write(buf []byte) (n int, err error) {
 		if err_tmp != nil {
 
 			fo.Err = ftp_context.NewLogItem("FileBasic.Write", true).
-				Set("after", "fo.Open()").
+				SetAfter("fo.Open()").
 				SetMessage("unable to open file").
 				Set("path", fo.Path).
 				Set("buf", d).
@@ -73,7 +73,7 @@ func (fo *FileBasic) Write(buf []byte) (n int, err error) {
 	if err != nil {
 		log.Println(err)
 		fo.Err = ftp_context.NewLogItem("FileBasic.Write", true).
-			Set("after", "fo.fo.Write").
+			SetAfter("fo.fo.Write").
 			Set("copied", n).
 			Set("path", fo.Path).
 			Set("buf", d).
@@ -92,7 +92,7 @@ func (fo *FileBasic) ReadAll() (data []byte, err error) {
 	data, err = io.ReadAll(fo.fo)
 	if err != nil {
 		err = ftp_context.NewLogItem("FileBasic.ReadAll", true).
-			Set("after", "io.ReadAll").
+			SetAfter("io.ReadAll").
 			Set("path", fo.Path).AppendParentError(err).
 			SetMessage(err.Error())
 
@@ -113,7 +113,7 @@ func (fo *FileBasic) Open() *FileBasic {
 	fo.fo, err = base.OpenFile(fo.Path, os.O_RDWR|os.O_SYNC)
 	if err != nil {
 		fo.Err = ftp_context.NewLogItem("FileBasic.Open", true).
-			Set("after", "base.OpenFile").
+			SetAfter("base.OpenFile").
 			Set("path", fo.Path).
 			SetMessage("unable to open file").
 			AppendParentError(err)
@@ -163,7 +163,7 @@ func (fo *FileBasic) Create() *FileBasic {
 			err = os.MkdirAll(dir, fs.FileMode(base.S_IRWXU|base.S_IRWXO))
 			if err != nil && !errors.Is(err, os.ErrExist) {
 				fo.Err = ftp_context.NewLogItem(loc, true).
-					Set("after", "os.MkdirAll").
+					SetAfter("os.MkdirAll").
 					Set("path", fo.Path).
 					Set("Mkdir", dir).
 					AppendParentError(err, err_pre)
@@ -173,7 +173,7 @@ func (fo *FileBasic) Create() *FileBasic {
 			return fo.Create()
 		}
 		fo.Err = ftp_context.NewLogItem(loc, true).
-			Set("after", "base.OpenFile").
+			SetAfter("base.OpenFile").
 			Set("path", fo.Path).
 			SetMessagef("failed to open file").AppendParentError(err)
 
@@ -203,7 +203,7 @@ func (fo *FileBasic) WriteJson(v any) ftp_context.LogErr {
 	t, err := json.MarshalIndent(v, " ", "\t")
 	if err != nil {
 		fo.Err = ftp_context.NewLogItem(loc, true).
-			Set("after", "json.MarshalIndent").
+			SetAfter("json.MarshalIndent").
 			Set("path", fo.Path).
 			SetMessage(err.Error()).AppendParentError(err, fo.Err)
 		return fo.Err
