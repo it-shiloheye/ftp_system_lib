@@ -12,6 +12,7 @@ type LogErr = *LogItem
 type LogItem struct {
 	Location  string         `json:"location"`
 	Time      time.Time      `json:"time"`
+	After     string         `json:"after"`
 	Body      map[string]any `json:"body"`
 	Message   string         `json:"message"`
 	Err       bool           `json:"is_error"`
@@ -51,6 +52,21 @@ func (li *LogItem) Set(key string, value any) *LogItem {
 		li.Body = make(map[string]any)
 	}
 	li.Body[key] = value
+
+	return li
+}
+
+func (li *LogItem) Setf(key string, str string, value ...any) *LogItem {
+	if li.Body == nil {
+		li.Body = make(map[string]any)
+	}
+	li.Body[key] = fmt.Sprintf(str, value...)
+
+	return li
+}
+
+func (li *LogItem) SetAfter(after string) *LogItem {
+	li.After = after
 
 	return li
 }
