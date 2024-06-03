@@ -100,7 +100,7 @@ func (cs CertSetup) UnderlyingError() error {
 
 // set up our CA certificate
 func NewCA(org *CertData) (cs *CertSetup) {
-	loc := "func (cs *CertSetup) NewCA() (cd *CertSetup)"
+	loc := "func NewCA(org *CertData) (cs *CertSetup)"
 	cs = new(CertSetup)
 	var err error
 	cs.CertData = org
@@ -158,11 +158,7 @@ func (c_a CertSetup) NewServerCert(org *CertData) (cs *CertSetup) {
 	loc := "func (cs *CertSetup) ServerKey()(cd *CertSetup) "
 	var err error
 	cs = new(CertSetup)
-	if c_a.CertData != nil {
-		cs.CertData = c_a.CertData
-	} else {
-		cs.CertData = org
-	}
+
 	// set up our server certificate
 	cs.cert = &x509.Certificate{
 		SerialNumber: big.NewInt(2019),
