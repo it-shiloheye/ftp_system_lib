@@ -39,7 +39,7 @@ func GinHandler(router *gin.Engine, server_cert *CertSetup, httpAddr string) (er
 	log.Println("starting", loc)
 
 	tlsConfig := &tls.Config{
-		Certificates: []tls.Certificate{server_cert.TlsCert},
+		Certificates: []tls.Certificate{server_cert.TlsCert.Certificate},
 	}
 	server := http.Server{Addr: httpAddr, Handler: router, TLSConfig: tlsConfig}
 
