@@ -8,7 +8,9 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"encoding/json"
 	"encoding/pem"
+	"log"
 	"math/big"
 	"net"
 	"time"
@@ -46,6 +48,39 @@ type CertSetup struct {
 	PrivKeyPEM *bytes.Buffer   `json:"private_key_pem"`
 	TlsCert    *TlsCertJson    `json:"tls_cert"`
 	err        error
+}
+
+type CAJson struct {
+	cert       *x509.Certificate
+	CertData   CertData        `json:"cert_data"`
+	PrivKey    *rsa.PrivateKey `json:"private_key"`
+	PEM        string          `json:"pem"`
+	PrivKeyPEM string          `json:"private_key_pem"`
+
+	err error
+}
+
+func (cs *CertSetup) NewCAJson() (caj *CAJson) {
+	caj = &CAJson{
+		CertData:   *cs.CertData,
+		cert:       cs.cert,
+		PrivKey:    cs.PrivKey,
+		PEM:        cs.PEM.String(),
+		PrivKeyPEM: cs.PrivKeyPEM.String(),
+	}
+
+	return
+}
+
+func (caj *CAJson) ToJSON() (s string, err error) {
+	loc := "func (caj *CAJson)ToJSON()(s string, err error)"
+	j, err := json.Marshal(caj)
+	if err != nil {
+		return "", ftp_context.NewLogItem(loc, true).SetAfter("json.Marshal(caj)").SetMessage(err.Error()).AppendParentError(err)
+	}
+	s = string(j)
+
+	return
 }
 
 type tlc_cert tls.Certificate
@@ -125,14 +160,21 @@ func NewCA(org *CertData) (cs *CertSetup) {
 	// create our private and public key
 	cs.PrivKey, err = rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
-		cs.err = ftp_context.NewLogItem(loc, true).Set("after", "rsa.GenerateKey(rand.Reader, 4096)").AppendParentError(err)
+		cs.err = ftp_context.NewLogItem(loc, true).
+			SetAfter("rsa.GenerateKey(rand.Reader, 4096)").
+			SetMessage(err.Error()).
+			AppendParentError(err)
 		return
 	}
 
 	// create the CA
-	caBytes, err := x509.CreateCertificate(rand.Reader, cs.cert, cs.cert, cs.PrivKey.PublicKey, cs.PrivKey)
+	caBytes, err := x509.CreateCertificate(rand.Reader, cs.cert, cs.cert, &cs.PrivKey.PublicKey, cs.PrivKey)
 	if err != nil {
-		cs.err = ftp_context.NewLogItem(loc, true).Set("after", "x509.CreateCertificate(rand.Reader, cs.cert, cs.cert, cs.PrivKey.PublicKey, cs.PrivKey)").AppendParentError(err)
+		log.Println(err)
+		cs.err = ftp_context.NewLogItem(loc, true).
+			Set("after", "x509.CreateCertificate(rand.Reader, cs.cert, cs.cert, cs.PrivKey.PublicKey, cs.PrivKey)").
+			SetMessage(err.Error()).
+			AppendParentError(err)
 		return
 
 	}
