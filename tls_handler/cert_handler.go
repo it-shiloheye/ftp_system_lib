@@ -2,6 +2,7 @@ package tlshandler
 
 import (
 	"bytes"
+	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/tls"
@@ -43,8 +44,46 @@ type CertSetup struct {
 	PrivKey    *rsa.PrivateKey `json:"private_key"`
 	PEM        *bytes.Buffer   `json:"pem"`
 	PrivKeyPEM *bytes.Buffer   `json:"private_key_pem"`
-	TlsCert    tls.Certificate `json:"tls_cert"`
+	TlsCert    *TlsCertJson    `json:"tls_cert"`
 	err        error
+}
+
+type tlc_cert tls.Certificate
+
+type TlsCertJson struct {
+	tls.Certificate
+	Cert [][]byte `json:"certificate"`
+	// PrivateKey contains the private key corresponding to the public key in
+	// Leaf. This must implement crypto.Signer with an RSA, ECDSA or Ed25519 PublicKey.
+	// For a server up to TLS 1.2, it can also implement crypto.Decrypter with
+	// an RSA PublicKey.
+	PrivKey crypto.PrivateKey `json:"private_key"`
+	// SupportedSignatureAlgorithms is an optional list restricting what
+	// signature algorithms the PrivateKey can be used for.
+	SSA []tls.SignatureScheme `json:"supported_signature_algorithms"`
+	// OCSPStaple contains an optional OCSP response which will be served
+	// to clients that request it.
+	OCSPS []byte `json:"OCSP_staple"`
+	// SignedCertificateTimestamps contains an optional list of Signed
+	// Certificate Timestamps which will be served to clients that request it.
+	SCT [][]byte `json:"signed_certificate_timestamps"`
+	// Leaf is the parsed form of the leaf certificate, which may be initialized
+	// using x509.ParseCertificate to reduce per-handshake processing. If nil,
+	// the leaf certificate will be parsed as needed.
+	L *x509.Certificate `json:"leaf"`
+}
+
+func NewTlsCertJson(tlc tls.Certificate) *TlsCertJson {
+
+	return &TlsCertJson{
+		Certificate: (tlc),
+		Cert:        tlc.Certificate,
+		PrivKey:     tlc.PrivateKey,
+		SSA:         tlc.SupportedSignatureAlgorithms,
+		OCSPS:       tlc.OCSPStaple,
+		SCT:         tlc.SignedCertificateTimestamps,
+		L:           tlc.Leaf,
+	}
 }
 
 func (cs CertSetup) HasErr() bool {
@@ -167,12 +206,13 @@ func (c_a CertSetup) NewServerCert(org *CertData) (cs *CertSetup) {
 		Bytes: x509.MarshalPKCS1PrivateKey(cs.PrivKey),
 	})
 
-	cs.TlsCert, err = tls.X509KeyPair(cs.PEM.Bytes(), cs.PrivKeyPEM.Bytes())
+	tlc_c, err := tls.X509KeyPair(cs.PEM.Bytes(), cs.PrivKeyPEM.Bytes())
 	if err != nil {
 		cs.err = ftp_context.NewLogItem(loc, true).Set("after", "tls.X509KeyPair(cs.PEM.Bytes(), cs.PrivKeyPEM.Bytes())").AppendParentError(err)
 		return
 	}
 
+	cs.TlsCert = NewTlsCertJson(tlc_c)
 	return cs
 }
 
@@ -184,7 +224,7 @@ func (cs CertSetup) ServerTlsConfig() (tlc *tls.Config, err error) {
 	}
 
 	tlc = &tls.Config{
-		Certificates: []tls.Certificate{cs.TlsCert},
+		Certificates: []tls.Certificate{cs.TlsCert.Certificate},
 	}
 
 	return
