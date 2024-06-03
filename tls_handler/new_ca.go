@@ -50,11 +50,11 @@ func GinHandler(router *gin.Engine, server_cert *CertSetup, httpAddr string) (er
 	return
 }
 
-func TLSClient(caPEMs ...*bytes.Buffer) (tc *http.Client) {
+func TLSClient(caPEMs ...[]byte) (tc *http.Client) {
 
 	certpool := x509.NewCertPool()
 	for _, caPEM := range caPEMs {
-		certpool.AppendCertsFromPEM(caPEM.Bytes())
+		certpool.AppendCertsFromPEM(caPEM)
 	}
 	tlc := &tls.Config{
 		RootCAs: certpool,
