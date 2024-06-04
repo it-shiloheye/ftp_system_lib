@@ -71,6 +71,11 @@ func (li *LogItem) SetAfter(after string) *LogItem {
 	return li
 }
 
+func (li *LogItem) SetAfterf(after string, v ...any) *LogItem {
+	li.After = fmt.Sprintf(after, v...)
+
+	return li
+}
 func (li *LogItem) Get(key string) (it any, ok bool) {
 	if li.Body == nil {
 		li.Body = make(map[string]any)
