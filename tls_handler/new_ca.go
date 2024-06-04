@@ -1,6 +1,7 @@
 package tlshandler
 
 import (
+	"bytes"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
