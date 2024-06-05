@@ -35,9 +35,8 @@ type FileTreeStruct struct {
 
 type FileHash struct {
 	FileBasic
-	Hash        string    `json:"hash"`
-	LastModTime time.Time `json:"last_mod_time"`
-	PrevModTime time.Time `json:"prev_mod_time"`
+	Hash    string    `json:"hash"`
+	ModTime time.Time `json:"last_mod_time"`
 }
 
 func init() {
