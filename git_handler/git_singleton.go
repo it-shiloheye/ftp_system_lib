@@ -120,18 +120,18 @@ func (gte *GitEngine) git_init(ctx ftp_context.Context, directory string) (err e
 }
 
 func (gte *GitEngine) git_add_gitignore(ctx ftp_context.Context, directory string) (err error) {
-	fo := filehandler.NewFileBasic(directory + "/.gitignore")
+	Fo := filehandler.NewFileBasic(directory + "/.gitignore")
 	b, err := os.ReadFile("./data/templates/.gitignore")
 	log.Println(b)
 	if err != nil {
 		return
 	}
-	_, err = fo.Create().Write(b)
+	_, err = Fo.Create().Write(b)
 	if err != nil {
-		log.Println(err, "\n", "fo.Create().Write(b)")
+		log.Println(err, "\n", "Fo.Create().Write(b)")
 		return
 	}
-	fo.Close()
+	Fo.Close()
 
 	return
 }

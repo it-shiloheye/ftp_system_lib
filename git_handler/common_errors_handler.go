@@ -31,8 +31,8 @@ func handle_common_git_errors(ctx ftp_context.Context, directory string, stderr 
 		}
 		log.Println(string(buf))
 
-		fo := filehandler.NewFileBasic(directory + "/.gitignore").Open()
-		if err = fo.Err; err != nil {
+		Fo := filehandler.NewFileBasic(directory + "/.gitignore").Open()
+		if err = Fo.Err; err != nil {
 			return
 		}
 		fo_2 := filehandler.NewFileBasic("./data/templates/.gitignore").Open()
@@ -44,9 +44,9 @@ func handle_common_git_errors(ctx ftp_context.Context, directory string, stderr 
 			return
 		}
 
-		fo.Write(buf)
-		if fo.Err != nil {
-			return false, fo.Err
+		Fo.Write(buf)
+		if Fo.Err != nil {
+			return false, Fo.Err
 		}
 
 		return true, nil

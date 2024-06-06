@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"hash"
-	"io"
 
 	ftp_context "github.com/it-shiloheye/ftp_system_lib/context"
 )
@@ -16,25 +15,18 @@ type BytesStore struct {
 }
 
 func (bs *BytesStore) Hash() (hash string, err error) {
-	loc := "bs.Hash"
+	loc := "func (bs *BytesStore) Hash() (hash string, err error)"
 	bs.h.Reset()
-	_, err = io.Copy(bs.h, &bs.Buffer)
-	if err != nil {
-		err = ftp_context.NewLogItem(loc, true).SetAfter("io.Copy").AppendParentError(err)
+	_, err1 := bs.WriteTo(bs.h)
+	if err1 != nil {
+		err = ftp_context.NewLogItem(loc, true).
+			SetAfter("_, err = bs.CopyTo(bs.h)").
+			SetMessage(err1.Error()).
+			AppendParentError(err1)
 		return
 	}
 	hash = fmt.Sprintf("%x", bs.h.Sum(nil))
 
-	return
-}
-
-func (bs *BytesStore) CopyFrom(fo io.Reader) (n int64, err error) {
-	n, err = io.Copy(&bs.Buffer, fo)
-	return
-}
-
-func (bs *BytesStore) CopyTo(fo io.Writer) (n int64, err error) {
-	n, err = io.Copy(fo, &bs.Buffer)
 	return
 }
 
