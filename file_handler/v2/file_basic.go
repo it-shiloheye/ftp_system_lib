@@ -17,17 +17,19 @@ import (
 type FileType string
 
 type FileBasic struct {
-	Path string   `json:"path"`
-	Type FileType `json:"type"`
-	Size int64    `json:"size"`
+	Path     string   `json:"path"`
+	FileType FileType `json:"type"`
+	Size     int64    `json:"size"`
 	// directly read write to the file
 	*os.File
 	fs os.FileInfo
-	fs.DirEntry
+	d  fs.DirEntry
 }
 
 func init() {
 	var _ io.ReadWriteCloser = &FileBasic{}
+
+	var _ fs.DirEntry = &FileBasic{}
 }
 
 func (Fo *FileBasic) IsOpen() bool {
@@ -36,6 +38,18 @@ func (Fo *FileBasic) IsOpen() bool {
 
 func (Fo *FileBasic) Fs() os.FileInfo {
 	return Fo.fs
+}
+
+func (Fo *FileBasic) Info() (os.FileInfo, error) {
+	return Fo.d.Info()
+}
+
+func (Fo *FileBasic) IsDir() bool {
+	return Fo.d.IsDir()
+}
+
+func (Fo *FileBasic) Type() fs.FileMode {
+	return Fo.d.Type()
 }
 
 func (Fo *FileBasic) ReadAll() (data []byte, err error) {
@@ -80,9 +94,9 @@ func Open(file_path string) (Fo *FileBasic, err error) {
 		return
 	}
 
-	Fo.DirEntry = fs.FileInfoToDirEntry(Fo.fs)
+	Fo.d = fs.FileInfoToDirEntry(Fo.fs)
 
-	Fo.Type = Ext(Fo)
+	Fo.FileType = Ext(Fo)
 	return
 }
 
@@ -91,24 +105,24 @@ func Ext(Fo *FileBasic) FileType {
 		panic("Provided nil pointer to filehandler.Ext(Fo *FileBasic) FileType")
 	}
 
-	if len(Fo.Type) > 0 {
-		return Fo.Type
+	if len(Fo.FileType) > 0 {
+		return Fo.FileType
 	}
 
 	if Fo.IsDir() {
-		Fo.Type = "dir"
-		return Fo.Type
+		Fo.FileType = "dir"
+		return Fo.FileType
 	}
 	stp_1 := strings.Split(Fo.Path, ".")
 	stp_2 := len(stp_1)
 	stp_3 := stp_1[stp_2-1]
 	if len(stp_3) > 4 {
-		Fo.Type = "unknown"
-		return Fo.Type
+		Fo.FileType = "unknown"
+		return Fo.FileType
 	}
 
-	Fo.Type = FileType(stp_3)
-	return Fo.Type
+	Fo.FileType = FileType(stp_3)
+	return Fo.FileType
 }
 
 func Create(file_path string) (Fo *FileBasic, err error) {
@@ -135,8 +149,8 @@ func Create(file_path string) (Fo *FileBasic, err error) {
 		return
 	}
 
-	Fo.DirEntry = fs.FileInfoToDirEntry(Fo.fs)
-	Fo.Type = Ext(Fo)
+	Fo.d = fs.FileInfoToDirEntry(Fo.fs)
+	Fo.FileType = Ext(Fo)
 	return
 }
 
