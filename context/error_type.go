@@ -3,7 +3,7 @@ package ftp_context
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
+
 	"time"
 )
 
@@ -107,9 +107,7 @@ func NewLogItem(loc string, err bool) (lt *LogItem) {
 
 func (lt *LogItem) SetMessage(v ...any) *LogItem {
 	lt.Message = fmt.Sprint(v...)
-	lt.Message = strings.ReplaceAll(lt.Message, "\\\\", "\\")
-	lt.Message = strings.ReplaceAll(lt.Message, "\\n", "\n")
-	lt.Message = strings.ReplaceAll(lt.Message, "\\t", "\t")
+
 	return lt
 }
 
