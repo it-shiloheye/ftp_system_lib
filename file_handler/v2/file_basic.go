@@ -22,7 +22,7 @@ type FileBasic struct {
 	Size int64    `json:"size"`
 	// directly read write to the file
 	*os.File
-	Fs os.FileInfo
+	fs os.FileInfo
 	fs.DirEntry
 }
 
@@ -32,6 +32,10 @@ func init() {
 
 func (Fo *FileBasic) IsOpen() bool {
 	return Fo.File != nil
+}
+
+func (Fo *FileBasic) Fs() os.FileInfo {
+	return Fo.fs
 }
 
 func (Fo *FileBasic) ReadAll() (data []byte, err error) {
@@ -47,7 +51,7 @@ func (Fo *FileBasic) ReadAll() (data []byte, err error) {
 }
 
 func (Fo *FileBasic) ModTime() string {
-	return Fo.Fs.ModTime().Format(time.RFC822Z)
+	return Fo.fs.ModTime().Format(time.RFC822Z)
 }
 
 func Open(file_path string) (Fo *FileBasic, err error) {
@@ -68,15 +72,15 @@ func Open(file_path string) (Fo *FileBasic, err error) {
 
 	}
 
-	Fo.Fs, err2 = Fo.File.Stat()
+	Fo.fs, err2 = Fo.File.Stat()
 	if err2 != nil {
 		err = ftp_context.NewLogItem(loc, true).
-			SetAfter("Fo.Fs, err2 = Fo.File.Stat()").
+			SetAfter("Fo.fs, err2 = Fo.File.Stat()").
 			SetMessagef("path: %s \nerror:\n%s", file_path, err2.Error()).AppendParentError(err2)
 		return
 	}
 
-	Fo.DirEntry = fs.FileInfoToDirEntry(Fo.Fs)
+	Fo.DirEntry = fs.FileInfoToDirEntry(Fo.fs)
 
 	Fo.Type = Ext(Fo)
 	return
@@ -123,15 +127,15 @@ func Create(file_path string) (Fo *FileBasic, err error) {
 
 	}
 
-	Fo.Fs, err2 = Fo.File.Stat()
+	Fo.fs, err2 = Fo.File.Stat()
 	if err2 != nil {
 		err = ftp_context.NewLogItem(loc, true).
-			SetAfter("Fo.Fs, err2 = Fo.File.Stat()").
+			SetAfter("Fo.fs, err2 = Fo.File.Stat()").
 			SetMessagef("path: %s \nerror:\n%s", file_path, err2.Error()).AppendParentError(err2)
 		return
 	}
 
-	Fo.DirEntry = fs.FileInfoToDirEntry(Fo.Fs)
+	Fo.DirEntry = fs.FileInfoToDirEntry(Fo.fs)
 	Fo.Type = Ext(Fo)
 	return
 }
