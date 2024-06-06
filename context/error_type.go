@@ -26,6 +26,10 @@ func (li *LogItem) Error() string {
 	return li.to_string()
 }
 
+func (li *LogItem) String() string {
+	return li.to_string()
+}
+
 func (li *LogItem) to_string() string {
 	stp_1 := func() string {
 		b, err := json.MarshalIndent(li, "\t", " ")
