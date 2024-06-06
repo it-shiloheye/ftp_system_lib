@@ -13,7 +13,7 @@ import (
 	"os/exec"
 
 	ftp_context "github.com/it-shiloheye/ftp_system_lib/context"
-	filehandler "github.com/it-shiloheye/ftp_system_lib/file_handler"
+	filehandler "github.com/it-shiloheye/ftp_system_lib/file_handler/v2"
 )
 
 type GitEngine struct {
@@ -120,18 +120,49 @@ func (gte *GitEngine) git_init(ctx ftp_context.Context, directory string) (err e
 }
 
 func (gte *GitEngine) git_add_gitignore(ctx ftp_context.Context, directory string) (err error) {
-	Fo := filehandler.NewFileBasic(directory + "/.gitignore")
-	b, err := os.ReadFile("./data/templates/.gitignore")
-	log.Println(b)
-	if err != nil {
+	loc := "func (gte *GitEngine) git_add_gitignore(ctx ftp_context.Context, directory string) (err error)"
+	fpath := directory + "/.gitignore"
+	Fo, err1 := filehandler.Create(fpath)
+	if err1 != nil {
+		err = &ftp_context.LogItem{
+			Location:  loc,
+			Time:      time.Now(),
+			After:     fmt.Sprintf(`Fo, err1 := filehandler.Create(%s)`, fpath),
+			CallStack: []error{err1},
+		}
+
 		return
 	}
-	_, err = Fo.Create().Write(b)
-	if err != nil {
-		log.Println(err, "\n", "Fo.Create().Write(b)")
+	b, err2 := os.ReadFile("./data/templates/.gitignore")
+	if err2 != nil {
+		err = &ftp_context.LogItem{
+			Location:  loc,
+			Time:      time.Now(),
+			After:     `b, err2 := os.ReadFile("./data/templates/.gitignore")`,
+			CallStack: []error{err2},
+		}
 		return
 	}
-	Fo.Close()
+	_, err3 := Fo.Write(b)
+	if err3 != nil {
+		err = &ftp_context.LogItem{
+			Location:  loc,
+			Time:      time.Now(),
+			After:     `_, err3 := Fo.Write(b)`,
+			CallStack: []error{err3},
+		}
+		return
+	}
+	err4 := Fo.Close()
+	if err4 != nil {
+		err = &ftp_context.LogItem{
+			Location:  loc,
+			Time:      time.Now(),
+			After:     `err4 := Fo.Close()`,
+			CallStack: []error{err4},
+		}
+		return
+	}
 
 	return
 }

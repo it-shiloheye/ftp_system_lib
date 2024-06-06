@@ -23,7 +23,7 @@ type FileBasic struct {
 	// directly read write to the file
 	*os.File
 	Fs os.FileInfo
-	d  fs.DirEntry
+	fs.DirEntry
 }
 
 func init() {
@@ -76,15 +76,22 @@ func Open(file_path string) (Fo *FileBasic, err error) {
 		return
 	}
 
+	Fo.DirEntry = fs.FileInfoToDirEntry(Fo.Fs)
+
 	Fo.Type = Ext(Fo)
 	return
 }
 
 func Ext(Fo *FileBasic) FileType {
+	if Fo == nil {
+		panic("Provided nil pointer to filehandler.Ext(Fo *FileBasic) FileType")
+	}
+
 	if len(Fo.Type) > 0 {
 		return Fo.Type
 	}
-	if Fo.d.IsDir() {
+
+	if Fo.IsDir() {
 		Fo.Type = "dir"
 		return Fo.Type
 	}
@@ -107,10 +114,9 @@ func Create(file_path string) (Fo *FileBasic, err error) {
 		Path: file_path,
 	}
 	Fo.File, err1 = base.OpenFile(file_path, os.O_RDWR|os.O_SYNC|os.O_CREATE)
-	if err != nil {
+	if err1 != nil {
 		err = ftp_context.NewLogItem(loc, true).
 			SetAfter("Fo.File, err1 = base.OpenFile(file_path, os.O_RDWR|os.O_SYNC|os.O_CREATE)").
-			Set("path", Fo.Path).
 			SetMessagef("path: %s \nerror:\n%s", file_path, err1.Error()).
 			AppendParentError(err1)
 		return
@@ -125,6 +131,7 @@ func Create(file_path string) (Fo *FileBasic, err error) {
 		return
 	}
 
+	Fo.DirEntry = fs.FileInfoToDirEntry(Fo.Fs)
 	Fo.Type = Ext(Fo)
 	return
 }

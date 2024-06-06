@@ -96,6 +96,7 @@ func NewLogItem(loc string, err bool) (lt *LogItem) {
 		Err:      err,
 		Location: loc,
 		Time:     time.Now(),
+		Body:     map[string]any{},
 	}
 	return
 }

@@ -5,11 +5,11 @@ import (
 	"strings"
 
 	// "sync"
-
 	"log"
+	"time"
 
 	ftp_context "github.com/it-shiloheye/ftp_system_lib/context"
-	filehandler "github.com/it-shiloheye/ftp_system_lib/file_handler"
+	filehandler "github.com/it-shiloheye/ftp_system_lib/file_handler/v2"
 )
 
 func handle_common_git_errors(ctx ftp_context.Context, directory string, stderr string, cmd_err error) (retry bool, err *ftp_context.LogItem) {
@@ -31,22 +31,28 @@ func handle_common_git_errors(ctx ftp_context.Context, directory string, stderr 
 		}
 		log.Println(string(buf))
 
-		Fo := filehandler.NewFileBasic(directory + "/.gitignore").Open()
-		if err = Fo.Err; err != nil {
-			return
-		}
-		fo_2 := filehandler.NewFileBasic("./data/templates/.gitignore").Open()
-		if err = fo_2.Err; err != nil {
-			return
-		}
-		buf, _ = fo_2.ReadAll()
-		if fo_2.Err != nil {
+		Fo, err1 := filehandler.Open(directory + "/.gitignore")
+		if err1 != nil {
 			return
 		}
 
-		Fo.Write(buf)
-		if Fo.Err != nil {
-			return false, Fo.Err
+		fo_2, err2 := filehandler.Open("./data/templates/.gitignore")
+		if err2 != nil {
+			return
+		}
+		buf, err1 = fo_2.ReadAll()
+		if err1 != nil {
+			return
+		}
+
+		_, err3 := Fo.Write(buf)
+		if err3 != nil {
+			err = &ftp_context.LogItem{
+				Location:  loc,
+				Time:      time.Now(),
+				CallStack: []error{err3},
+			}
+			return
 		}
 
 		return true, nil

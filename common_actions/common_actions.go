@@ -10,21 +10,42 @@ import (
 
 	"github.com/it-shiloheye/ftp_system_lib/base"
 	ftp_context "github.com/it-shiloheye/ftp_system_lib/context"
-	filehandler "github.com/it-shiloheye/ftp_system_lib/file_handler"
+	filehandler "github.com/it-shiloheye/ftp_system_lib/file_handler/v2"
 )
 
 func Write_directory_files_list(dir_path string, files []filehandler.FileBasic) (err *ftp_context.LogItem) {
-
+	loc := "Write_directory_files_list(dir_path string, files []filehandler.FileBasic) (err *ftp_context.LogItem)"
 	name := func() string {
 		a := time.Now()
 		b := fmt.Sprintf("files/%d/%02d_%02d.json", a.Year(), a.Month(), a.Day())
 		return b
 	}()
 
-	txt_file := filehandler.NewFileBasic(dir_path + "\\" + name)
+	txt_file, err1 := filehandler.Create(dir_path + "\\" + name)
+	if err1 != nil {
+		err = &ftp_context.LogItem{
+			Location:  loc,
+			Time:      time.Now(),
+			After:     `txt_file, err1 := filehandler.Create(dir_path + "\\" + name)`,
+			Message:   err1.Error(),
+			CallStack: []error{err1},
+		}
 
-	err = txt_file.Create().
-		WriteJson(files)
+		return
+	}
+
+	err2 := filehandler.WriteJson(txt_file, files)
+	if err2 != nil {
+		err = &ftp_context.LogItem{
+			Location:  loc,
+			Time:      time.Now(),
+			After:     `err2 := filehandler.WriteJson(txt_file,files)`,
+			Message:   err2.Error(),
+			CallStack: []error{err2},
+		}
+
+		return
+	}
 
 	return
 }

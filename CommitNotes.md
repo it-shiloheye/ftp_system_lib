@@ -1,5 +1,10 @@
 # Commit Notes
 
+### 06th June 2024, 13:57 AM GMT+3
+    
+    1. Fixing Run Time Bug (panic on Calling FileBasic.Direntry)
+    2. Able to create and write a file
+
 ### 06th June 2024, 11:39 AM GMT+3
     
     1. Deleting old FileBasic, old FileTree, old FileHash
