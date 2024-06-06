@@ -1,6 +1,9 @@
 # Commit Notes
 
-### 06th June 2024, 13:57 AM GMT+3
+### 06th June 2024, 19:11 PM GMT+3
+    1. fixing json error: 'json: cannot unmarshal object into Go struct field Fs of type fs.FileInfo\'
+
+### 06th June 2024, 13:57 PM GMT+3
     
     1. Fixing Run Time Bug (panic on Calling FileBasic.Direntry)
     2. Able to create and write a file
