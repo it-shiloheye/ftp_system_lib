@@ -125,10 +125,10 @@ func (gte *GitEngine) git_add_gitignore(ctx ftp_context.Context, directory strin
 	Fo, err1 := filehandler.Create(fpath)
 	if err1 != nil {
 		err = &ftp_context.LogItem{
-			Location:  loc,
-			Time:      time.Now(),
-			After:     fmt.Sprintf(`Fo, err1 := filehandler.Create(%s)`, fpath),
-			CallStack: []error{err1},
+			Location: loc,
+			Time:     time.Now(),
+			After:    fmt.Sprintf(`Fo, err1 := filehandler.Create(%s)`, fpath),
+			Err:      true, CallStack: []error{err1},
 		}
 
 		return
@@ -136,30 +136,30 @@ func (gte *GitEngine) git_add_gitignore(ctx ftp_context.Context, directory strin
 	b, err2 := os.ReadFile("./data/templates/.gitignore")
 	if err2 != nil {
 		err = &ftp_context.LogItem{
-			Location:  loc,
-			Time:      time.Now(),
-			After:     `b, err2 := os.ReadFile("./data/templates/.gitignore")`,
-			CallStack: []error{err2},
+			Location: loc,
+			Time:     time.Now(),
+			After:    `b, err2 := os.ReadFile("./data/templates/.gitignore")`,
+			Err:      true, CallStack: []error{err2},
 		}
 		return
 	}
 	_, err3 := Fo.Write(b)
 	if err3 != nil {
 		err = &ftp_context.LogItem{
-			Location:  loc,
-			Time:      time.Now(),
-			After:     `_, err3 := Fo.Write(b)`,
-			CallStack: []error{err3},
+			Location: loc,
+			Time:     time.Now(),
+			After:    `_, err3 := Fo.Write(b)`,
+			Err:      true, CallStack: []error{err3},
 		}
 		return
 	}
 	err4 := Fo.Close()
 	if err4 != nil {
 		err = &ftp_context.LogItem{
-			Location:  loc,
-			Time:      time.Now(),
-			After:     `err4 := Fo.Close()`,
-			CallStack: []error{err4},
+			Location: loc,
+			Time:     time.Now(),
+			After:    `err4 := Fo.Close()`,
+			Err:      true, CallStack: []error{err4},
 		}
 		return
 	}

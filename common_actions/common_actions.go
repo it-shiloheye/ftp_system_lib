@@ -24,11 +24,11 @@ func Write_directory_files_list(dir_path string, files []filehandler.FileBasic) 
 	txt_file, err1 := filehandler.Create(dir_path + "\\" + name)
 	if err1 != nil {
 		err = &ftp_context.LogItem{
-			Location:  loc,
-			Time:      time.Now(),
-			After:     `txt_file, err1 := filehandler.Create(dir_path + "\\" + name)`,
-			Message:   err1.Error(),
-			CallStack: []error{err1},
+			Location: loc,
+			Time:     time.Now(),
+			After:    `txt_file, err1 := filehandler.Create(dir_path + "\\" + name)`,
+			Message:  err1.Error(),
+			Err:      true, CallStack: []error{err1},
 		}
 
 		return
@@ -37,11 +37,11 @@ func Write_directory_files_list(dir_path string, files []filehandler.FileBasic) 
 	err2 := filehandler.WriteJson(txt_file, files)
 	if err2 != nil {
 		err = &ftp_context.LogItem{
-			Location:  loc,
-			Time:      time.Now(),
-			After:     `err2 := filehandler.WriteJson(txt_file,files)`,
-			Message:   err2.Error(),
-			CallStack: []error{err2},
+			Location: loc,
+			Time:     time.Now(),
+			After:    `err2 := filehandler.WriteJson(txt_file,files)`,
+			Message:  err2.Error(),
+			Err:      true, CallStack: []error{err2},
 		}
 
 		return

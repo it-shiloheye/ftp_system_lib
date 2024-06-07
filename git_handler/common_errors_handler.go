@@ -48,9 +48,9 @@ func handle_common_git_errors(ctx ftp_context.Context, directory string, stderr 
 		_, err3 := Fo.Write(buf)
 		if err3 != nil {
 			err = &ftp_context.LogItem{
-				Location:  loc,
-				Time:      time.Now(),
-				CallStack: []error{err3},
+				Location: loc,
+				Time:     time.Now(),
+				Err:      true, CallStack: []error{err3},
 			}
 			return
 		}

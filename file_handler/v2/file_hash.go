@@ -9,8 +9,8 @@ import (
 
 type FileHash struct {
 	*FileBasic
-	Hash    string    `json:"hash"`
-	ModTime time.Time `json:"last_mod_time"`
+	Hash    string `json:"hash"`
+	ModTime string `json:"last_mod_time"`
 }
 
 func HashFile(Fo *FileBasic, bs *BytesStore) (hash string, err error) {
@@ -38,11 +38,11 @@ func HashFile(Fo *FileBasic, bs *BytesStore) (hash string, err error) {
 	_, err1 = bs.ReadFrom(Fo.File)
 	if err1 != nil {
 		err = &ftp_context.LogItem{
-			Location:  loc,
-			Time:      time.Now(),
-			After:     `_, err1 = bs.ReadFrom(Fo.File)`,
-			Message:   err1.Error(),
-			CallStack: []error{err1},
+			Location: loc,
+			Time:     time.Now(),
+			After:    `_, err1 = bs.ReadFrom(Fo.File)`,
+			Message:  err1.Error(),
+			Err:      true, CallStack: []error{err1},
 		}
 		return
 	}
@@ -50,11 +50,11 @@ func HashFile(Fo *FileBasic, bs *BytesStore) (hash string, err error) {
 	hash, err2 = bs.Hash()
 	if err2 != nil {
 		err = &ftp_context.LogItem{
-			Location:  loc,
-			Time:      time.Now(),
-			After:     `hash, err2 = bs.Hash()`,
-			Message:   err2.Error(),
-			CallStack: []error{err2},
+			Location: loc,
+			Time:     time.Now(),
+			After:    `hash, err2 = bs.Hash()`,
+			Message:  err2.Error(),
+			Err:      true, CallStack: []error{err2},
 		}
 		return
 	}
@@ -68,14 +68,16 @@ func NewFileHashOpen(file_path string) (Fh *FileHash, err error) {
 	Fh.FileBasic, err1 = Open(file_path)
 	if err1 != nil {
 		err = &ftp_context.LogItem{
-			Location:  loc,
-			Time:      time.Now(),
-			After:     fmt.Sprintf(`Fh.FileBasic, err1 = Open("%s")`, file_path),
-			Message:   err1.Error(),
-			CallStack: []error{err1},
+			Location: loc,
+			Time:     time.Now(),
+			After:    fmt.Sprintf(`Fh.FileBasic, err1 = Open("%s")`, file_path),
+			Message:  err1.Error(),
+			Err:      true, CallStack: []error{err1},
 		}
 		return
 	}
+
+	Fh.ModTime = fmt.Sprint(Fh.fs.ModTime())
 
 	return
 }
@@ -87,11 +89,11 @@ func NewFileHashCreate(file_path string) (Fh *FileHash, err error) {
 	Fh.FileBasic, err1 = Create(file_path)
 	if err1 != nil {
 		err = &ftp_context.LogItem{
-			Location:  loc,
-			Time:      time.Now(),
-			After:     fmt.Sprintf(`Fh.FileBasic, err1 = Create("%s")`, file_path),
-			Message:   err1.Error(),
-			CallStack: []error{err1},
+			Location: loc,
+			Time:     time.Now(),
+			After:    fmt.Sprintf(`Fh.FileBasic, err1 = Create("%s")`, file_path),
+			Message:  err1.Error(),
+			Err:      true, CallStack: []error{err1},
 		}
 		return
 	}

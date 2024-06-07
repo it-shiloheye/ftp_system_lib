@@ -1,5 +1,9 @@
 # Commit Notes
 
+### 08th June 2024, 02:17 PM GMT+3
+    1. fixing bugs in modtime
+    2. adding lockfile item to lock directory/file
+
 ### 06th June 2024, 19:11 PM GMT+3
     1. fixing json error: 'json: cannot unmarshal object into Go struct field Fs of type fs.FileInfo\'
 
