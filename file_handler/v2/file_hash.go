@@ -9,8 +9,9 @@ import (
 
 type FileHash struct {
 	*FileBasic
-	Hash    string `json:"hash"`
-	ModTime string `json:"last_mod_time"`
+	Hash     string         `json:"hash"`
+	ModTime  string         `json:"last_mod_time"`
+	MetaData map[string]any `json:"meta_data"`
 }
 
 func HashFile(Fo *FileBasic, bs *BytesStore) (hash string, err error) {
@@ -98,5 +99,26 @@ func NewFileHashCreate(file_path string) (Fh *FileHash, err error) {
 		return
 	}
 
+	return
+}
+
+func (fh *FileHash) Get(key string) (it any, ok bool) {
+	it, ok = fh.MetaData[key]
+	return
+}
+
+func (fh *FileHash) Set(key string, val any) {
+
+	fh.MetaData[key] = val
+}
+
+func GetFileHash[T any](fh *FileHash, key string) (it T, ok bool) {
+
+	a, ok_ := fh.Get(key)
+	if !ok_ {
+		return
+	}
+
+	it, ok = a.(T)
 	return
 }
