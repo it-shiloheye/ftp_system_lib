@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"log"
 	"os"
 	"time"
 
@@ -15,31 +14,24 @@ type LockFile struct {
 	name string
 }
 
-type err_type struct {
-	err string
-}
-
-func (err *err_type) Error() string {
-	return err.err
-}
-
-var (
-	ErrExist = &err_type{err: "file already exists"}
-)
-
 func Lock(file_path string) (lf *LockFile, err error) {
-	err2 := os.Mkdir(file_path, os.FileMode(os.ModeExclusive))
-	if err2 != nil {
-		if errors.Is(err2, os.ErrExist) {
-			return nil, ErrExist
+	err1 := os.MkdirAll(file_path, os.FileMode(os.ModeExclusive))
+	if err1 != nil {
+		if errors.Is(err1, os.ErrExist) {
+			err = err1
+			return
 		}
 		err = &ftp_context.LogItem{
 			Location: fmt.Sprintf(`Lock("%s" string) (lf *LockFile, err error)`, file_path),
 			Time:     time.Now(),
-			After:    "err2 := os.Mkdir(file_path, os.FileMode(os.ModeExclusive))",
-			Message:  err2.Error(),
+			After:    fmt.Sprintf(`err1 := os.MkdirAll("%s", os.FileMode(os.ModeExclusive))`, file_path),
+			Message:  err1.Error(),
 		}
-		return nil, err
+		return
+	}
+
+	lf = &LockFile{
+		name: file_path,
 	}
 
 	return
@@ -47,11 +39,14 @@ func Lock(file_path string) (lf *LockFile, err error) {
 
 func (lf *LockFile) Unlock() error {
 	err1 := os.Remove(lf.name)
-	log.Println(&ftp_context.LogItem{
+	if err1 == nil {
+		return nil
+	}
+	err2 := &ftp_context.LogItem{
 		Location: `func (lf *LockFile) Unlock() error`,
 		Time:     time.Now(),
 		After:    fmt.Sprintf(`err1 := os.Remove("%s")`, lf.name),
 		Message:  err1.Error(),
-	})
-	return err1
+	}
+	return err2
 }

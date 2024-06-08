@@ -1,5 +1,8 @@
 # Commit Notes
 
+### 08th June 2024, 09:50 AM GMT+3
+    1. Adding MetaData Map to FileHash object
+
 ### 08th June 2024, 02:17 PM GMT+3
     1. fixing bugs in modtime
     2. adding lockfile item to lock directory/file
