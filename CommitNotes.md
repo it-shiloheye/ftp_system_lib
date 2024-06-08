@@ -1,6 +1,12 @@
 # Commit Notes
 
 ### 08th June 2024, 09:50 AM GMT+3
+    1. Fixing bug in lockfile:
+        - was returning a nil pointer at .Lock
+        - was calling err1.Error() at .Unlock without checking for nil
+
+
+### 08th June 2024, 09:50 AM GMT+3
     1. Adding MetaData Map to FileHash object
 
 ### 08th June 2024, 02:17 PM GMT+3
