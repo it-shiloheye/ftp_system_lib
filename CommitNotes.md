@@ -1,5 +1,29 @@
 # Commit Notes
 
+### 14th June 2024, 01:36 AM GMT +3
+```sh
+1. Moving logging into ftp_system_lib 
+    for uniformity
+2. Want 4 layer logging:
+    - day_log
+    - err_log
+    - latest_log
+    - history_log (max file size count)
+3. Complex logger structure not yet ready
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch main
+# Your branch is up to date with 'origin/main'.
+#
+# Changes to be committed:
+#	new file:   logging/error_type.go
+#	new file:   logging/fake_logger.go
+#	new file:   logging/logging_struct.go
+#
+
+```
+
 ### 08th June 2024, 09:50 AM GMT+3
     1. Fixing bug in lockfile:
         - was returning a nil pointer at .Lock
