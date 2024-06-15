@@ -174,7 +174,7 @@ type CAPem struct {
 }
 
 func GenerateCAPem(X509_ x509.Certificate) (caPem CAPem, err error) {
-	loc := "func GenerateCAPem() (caPem CAPem, err error)"
+	loc := log_item.Loc("func GenerateCAPem() (caPem CAPem, err error)")
 	caPem = CAPem{
 		X509: X509_,
 	}
@@ -223,7 +223,7 @@ type TLSCert struct {
 }
 
 func GenerateTLSCert(ca_pem CAPem, X509_ x509.Certificate) (tls_cert TLSCert, err error) {
-	loc := "func GenerateTLSCert(ca_pem CAPem) (tls_cert TLSCert, err error)"
+	loc := log_item.Loc("func GenerateTLSCert(ca_pem CAPem) (tls_cert TLSCert, err error)")
 	tls_cert = TLSCert{}
 	// set up our server certificate
 	tls_cert.X509 = X509_

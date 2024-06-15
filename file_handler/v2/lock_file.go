@@ -22,7 +22,7 @@ func Lock(file_path string) (lf *LockFile, err error) {
 			return
 		}
 		err = &log_item.LogItem{
-			Location: fmt.Sprintf(`Lock("%s" string) (lf *LockFile, err error)`, file_path),
+			Location: log_item.Locf(`Lock("%s" string) (lf *LockFile, err error)`, file_path),
 			Time:     time.Now(),
 			After:    fmt.Sprintf(`err1 := os.MkdirAll("%s", os.FileMode(os.ModeExclusive))`, file_path),
 			Message:  err1.Error(),
@@ -43,7 +43,7 @@ func (lf *LockFile) Unlock() error {
 		return nil
 	}
 	err2 := &log_item.LogItem{
-		Location: `func (lf *LockFile) Unlock() error`,
+		Location: log_item.Loc(`func (lf *LockFile) Unlock() error`),
 		Time:     time.Now(),
 		After:    fmt.Sprintf(`err1 := os.Remove("%s")`, lf.name),
 		Message:  err1.Error(),

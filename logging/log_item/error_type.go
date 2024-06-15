@@ -15,6 +15,10 @@ func Locf(str string, v ...any) Loc {
 	return Loc(fmt.Sprintf(str, v...))
 }
 
+func (l Loc) String() string {
+	return string(l)
+}
+
 type LogLevel int
 
 const (
@@ -132,7 +136,7 @@ func (ll LogLevel) String() string {
 }
 
 type LogItem struct {
-	Location  string         `json:"location"`
+	Location  Loc            `json:"location"`
 	Time      time.Time      `json:"time"`
 	After     string         `json:"after"`
 	Body      map[string]any `json:"body"`
@@ -151,6 +155,28 @@ func (li *LogItem) Set(key string, value any) *LogItem {
 	}
 	li.Body[key] = value
 
+	return li
+}
+
+func (li *LogItem) SetLoc(loc Loc) *LogItem {
+	li.Location = loc
+
+	return li
+}
+
+func (li *LogItem) SetLocf(str string, v ...any) *LogItem {
+	li.Location = Locf(str, v...)
+
+	return li
+}
+
+func (li *LogItem) SetLevel(level LogLevel) *LogItem {
+	li.Level = level
+	return li
+}
+
+func (li *LogItem) SetTime(t time.Time) *LogItem {
+	li.Time = t
 	return li
 }
 
@@ -189,7 +215,7 @@ func (li *LogItem) AppendParentError(err ...error) *LogItem {
 	return li
 }
 
-func NewLogItem(loc string, log_level LogLevel) (lt *LogItem) {
+func NewLogItem(loc Loc, log_level LogLevel) (lt *LogItem) {
 	lt = &LogItem{
 		Level:    log_level,
 		Location: loc,
@@ -197,6 +223,30 @@ func NewLogItem(loc string, log_level LogLevel) (lt *LogItem) {
 		Body:     map[string]any{},
 	}
 	return
+}
+
+func NewLogf(str string, v ...any) (lt *LogItem) {
+	lt = &LogItem{
+		Message: fmt.Sprintf(str, v...),
+		Body:    map[string]any{},
+	}
+
+	return
+}
+
+func NewLogErr(loc Loc, log_level LogLevel) (lt *LogItem) {
+	lt = &LogItem{
+		Level:    log_level,
+		Location: loc,
+		Time:     time.Now(),
+		Body:     map[string]any{},
+	}
+	return
+}
+
+func (lt *LogItem) Now() *LogItem {
+	lt.Time = time.Now()
+	return lt
 }
 
 func (lt *LogItem) SetMessage(v ...any) *LogItem {
@@ -224,7 +274,7 @@ func (lt *LogItem) Print(print_option ...PrintOptions) string {
 	}
 
 	po := PO_PLAIN
-	if print_option != nil && len(print_option) > 0 {
+	if len(print_option) > 0 {
 		po = print_option[0]
 	}
 
@@ -248,7 +298,7 @@ func (lt *LogItem) Print(print_option ...PrintOptions) string {
 		msg = fmt.Sprintf("%s: %s", lt.Level.String(), fmt.Sprint(lt.Time))
 
 		if len(lt.Location) > 0 {
-			msg += "\nLoc: " + lt.Location
+			msg += "\nLoc: " + lt.Location.String()
 		}
 		if len(lt.After) > 0 && lt.Level > LogLevelInfo02 {
 			msg += "\nAfter: " + lt.After

@@ -15,7 +15,7 @@ type FileHash struct {
 }
 
 func HashFile(Fo *FileBasic, bs *BytesStore) (hash string, err error) {
-	loc := " NewFileHash(Fo *FileBasic, bs *BytesStore)(hash string, err error)"
+	loc := log_item.Loc(" NewFileHash(Fo *FileBasic, bs *BytesStore)(hash string, err error)")
 	if Fo == nil || Fo.File == nil {
 		err = &log_item.LogItem{
 			Location: loc,
@@ -63,7 +63,7 @@ func HashFile(Fo *FileBasic, bs *BytesStore) (hash string, err error) {
 }
 
 func NewFileHashOpen(file_path string) (Fh *FileHash, err error) {
-	loc := "NewFileHashOpen(file_path string) (Fh *FileHash, err error)"
+	loc := log_item.Loc("NewFileHashOpen(file_path string) (Fh *FileHash, err error)")
 	Fh = &FileHash{}
 	var err1 error
 	Fh.FileBasic, err1 = Open(file_path)
@@ -84,7 +84,7 @@ func NewFileHashOpen(file_path string) (Fh *FileHash, err error) {
 }
 
 func NewFileHashCreate(file_path string) (Fh *FileHash, err error) {
-	loc := "NewFileHashOpen(file_path string) (Fh *FileHash, err error)"
+	loc := log_item.Loc("NewFileHashOpen(file_path string) (Fh *FileHash, err error)")
 	Fh = &FileHash{}
 	var err1 error
 	Fh.FileBasic, err1 = Create(file_path)

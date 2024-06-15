@@ -15,7 +15,7 @@ type BytesStore struct {
 }
 
 func (bs *BytesStore) Hash() (hash string, err error) {
-	loc := "func (bs *BytesStore) Hash() (hash string, err error)"
+	loc := log_item.Loc("func (bs *BytesStore) Hash() (hash string, err error)")
 	bs.h.Reset()
 	_, err1 := bs.WriteTo(bs.h)
 	if err1 != nil {

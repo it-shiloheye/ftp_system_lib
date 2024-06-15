@@ -37,7 +37,7 @@ var log_today_file = &filehandler.FileBasic{}
 func InitialiseLogging(logging_dir string) {
 	log.Println("loading logger")
 
-	loc := "ftp_system/client/main_thread/logging/logging_struct.go"
+	loc := log_item.Loc("ftp_system/client/main_thread/logging/logging_struct.go")
 	log_file_p := logging_dir + "/log/log_file.txt"
 	log_err_file_p := logging_dir + "/log/log_err_file.txt"
 	log_today_file_p := logging_dir + "/log/sess/" + log_file_name() + ".txt"
@@ -103,7 +103,7 @@ func (ls *LoggerStruct) Log(li *log_item.LogItem) {
 
 func (ls *LoggerStruct) Logf(loc log_item.Loc, str string, v ...any) {
 	ls.comm <- &log_item.LogItem{
-		Location: string(loc),
+		Location: loc,
 		Time:     time.Now(),
 		Message:  fmt.Sprintf(str, v...),
 	}
@@ -111,7 +111,7 @@ func (ls *LoggerStruct) Logf(loc log_item.Loc, str string, v ...any) {
 
 func (ls *LoggerStruct) LogErr(loc log_item.Loc, err error) error {
 	e := &log_item.LogItem{
-		Location:  string(loc),
+		Location:  loc,
 		Time:      time.Now(),
 		Level:     log_item.LogLevelError02,
 		Message:   err.Error(),

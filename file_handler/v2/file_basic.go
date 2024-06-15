@@ -69,7 +69,7 @@ func (Fo *FileBasic) ModTime() string {
 }
 
 func Open(file_path string) (Fo *FileBasic, err error) {
-	loc := "Fo.File, err = base.OpenFile(Fo.Path, os.O_RDWR|os.O_SYNC)"
+	loc := log_item.Loc("Fo.File, err = base.OpenFile(Fo.Path, os.O_RDWR|os.O_SYNC)")
 	var err1, err2 error
 	Fo = &FileBasic{
 		Path: file_path,
@@ -126,7 +126,7 @@ func Ext(Fo *FileBasic) FileType {
 }
 
 func Create(file_path string) (Fo *FileBasic, err error) {
-	loc := "Create(file_path string) (Fo *FileBasic,err error)"
+	loc := log_item.Loc("Create(file_path string) (Fo *FileBasic,err error)")
 	var err1, err2 error
 	Fo = &FileBasic{
 		Path: file_path,
@@ -162,7 +162,7 @@ func NewFileBasic(path string) (Fo *FileBasic) {
 }
 
 func WriteJson(Fo *FileBasic, v any) (err error) {
-	loc := "WriteJson(Fo *FileBasic, v any)(err error)"
+	loc := log_item.Loc("WriteJson(Fo *FileBasic, v any)(err error)")
 	var err1, err2 error
 	t, err1 := json.MarshalIndent(v, " ", "\t")
 	if err1 != nil {
