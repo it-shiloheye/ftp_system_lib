@@ -141,30 +141,8 @@ type LogItem struct {
 	CallStack []error        `json:"call_stack"`
 }
 
-func (li *LogItem) Error() string {
-	if li.Level < LogLevelWarn {
-		return ""
-	}
-	return li.to_string()
-}
-
 func (li *LogItem) String() string {
-	return li.to_string()
-}
-
-func (li *LogItem) to_string() string {
-	stp_1 := func() string {
-		b, err := json.MarshalIndent(li, "\t", " ")
-		if err != nil {
-			panic(fmt.Sprint("LogItem.Error json.MarshalIndent ", err.Error()))
-		}
-		return string(b)
-	}()
-
-	stp_2 := fmt.Sprintf("%s:\n%s:\n%s", li.Time.Format(time.RFC822Z), li.Location, stp_1)
-
-	stp_3 := fmt.Sprint("%s ", li.Level.String(), stp_2)
-	return stp_3
+	return li.Print(PO_LINE)
 }
 
 func (li *LogItem) Set(key string, value any) *LogItem {
@@ -245,10 +223,10 @@ func (lt *LogItem) Print(print_option ...PrintOptions) string {
 		return lt.Message
 	}
 
-	if len(print_option) < 1 {
-		return lt.to_string()
+	po := PO_PLAIN
+	if print_option != nil && len(print_option) > 0 {
+		po = print_option[0]
 	}
-	po := print_option[0]
 
 	var msg string
 	switch po {
@@ -257,6 +235,13 @@ func (lt *LogItem) Print(print_option ...PrintOptions) string {
 
 		if len(lt.Message) > 0 {
 			msg += "\nMessage: " + lt.Message
+		}
+
+		if lt.CallStack != nil {
+
+			for i := len(lt.CallStack); i > 0; i-- {
+				msg += "\nError: " + lt.CallStack[i].Error()
+			}
 		}
 		return msg
 	case PO_LINE:
@@ -272,7 +257,7 @@ func (lt *LogItem) Print(print_option ...PrintOptions) string {
 			msg += "\nMessage: " + lt.Message
 		}
 
-		if lt.Level >= LogLevelError01 {
+		if lt.Level >= LogLevelError01 && lt.CallStack != nil {
 			for _, line := range lt.CallStack {
 				msg += "\n"
 
@@ -295,4 +280,11 @@ func (lt *LogItem) Print(print_option ...PrintOptions) string {
 	}
 
 	return lt.String()
+}
+
+func (li *LogItem) Error() string {
+	if li.Level < LogLevelWarn {
+		return ""
+	}
+	return li.Print(PO_JSON)
 }
