@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	ftp_context "github.com/it-shiloheye/ftp_system_lib/context"
+	"github.com/it-shiloheye/ftp_system_lib/logging/log_item"
 )
 
 type LockFile struct {
@@ -21,7 +21,7 @@ func Lock(file_path string) (lf *LockFile, err error) {
 			err = err1
 			return
 		}
-		err = &ftp_context.LogItem{
+		err = &log_item.LogItem{
 			Location: fmt.Sprintf(`Lock("%s" string) (lf *LockFile, err error)`, file_path),
 			Time:     time.Now(),
 			After:    fmt.Sprintf(`err1 := os.MkdirAll("%s", os.FileMode(os.ModeExclusive))`, file_path),
@@ -42,7 +42,7 @@ func (lf *LockFile) Unlock() error {
 	if err1 == nil {
 		return nil
 	}
-	err2 := &ftp_context.LogItem{
+	err2 := &log_item.LogItem{
 		Location: `func (lf *LockFile) Unlock() error`,
 		Time:     time.Now(),
 		After:    fmt.Sprintf(`err1 := os.Remove("%s")`, lf.name),

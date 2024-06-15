@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	ftp_context "github.com/it-shiloheye/ftp_system_lib/context"
+	"github.com/it-shiloheye/ftp_system_lib/logging/log_item"
 )
 
 type FileHash struct {
@@ -17,7 +17,7 @@ type FileHash struct {
 func HashFile(Fo *FileBasic, bs *BytesStore) (hash string, err error) {
 	loc := " NewFileHash(Fo *FileBasic, bs *BytesStore)(hash string, err error)"
 	if Fo == nil || Fo.File == nil {
-		err = &ftp_context.LogItem{
+		err = &log_item.LogItem{
 			Location: loc,
 			Time:     time.Now(),
 			Message:  "FileBasic or os.File pointer is nil",
@@ -25,7 +25,7 @@ func HashFile(Fo *FileBasic, bs *BytesStore) (hash string, err error) {
 		return
 	}
 	if bs == nil || bs.h == nil {
-		err = &ftp_context.LogItem{
+		err = &log_item.LogItem{
 			Location: loc,
 			Time:     time.Now(),
 			Message:  "ByteStore pointer provided is invalid",
@@ -38,24 +38,24 @@ func HashFile(Fo *FileBasic, bs *BytesStore) (hash string, err error) {
 
 	_, err1 = bs.ReadFrom(Fo.File)
 	if err1 != nil {
-		err = &ftp_context.LogItem{
+		err = &log_item.LogItem{
 			Location: loc,
 			Time:     time.Now(),
 			After:    `_, err1 = bs.ReadFrom(Fo.File)`,
 			Message:  err1.Error(),
-			Err:      true, CallStack: []error{err1},
+			Level:    log_item.LogLevelError02, CallStack: []error{err1},
 		}
 		return
 	}
 
 	hash, err2 = bs.Hash()
 	if err2 != nil {
-		err = &ftp_context.LogItem{
+		err = &log_item.LogItem{
 			Location: loc,
 			Time:     time.Now(),
 			After:    `hash, err2 = bs.Hash()`,
 			Message:  err2.Error(),
-			Err:      true, CallStack: []error{err2},
+			Level:    log_item.LogLevelError02, CallStack: []error{err2},
 		}
 		return
 	}
@@ -68,12 +68,12 @@ func NewFileHashOpen(file_path string) (Fh *FileHash, err error) {
 	var err1 error
 	Fh.FileBasic, err1 = Open(file_path)
 	if err1 != nil {
-		err = &ftp_context.LogItem{
+		err = &log_item.LogItem{
 			Location: loc,
 			Time:     time.Now(),
 			After:    fmt.Sprintf(`Fh.FileBasic, err1 = Open("%s")`, file_path),
 			Message:  err1.Error(),
-			Err:      true, CallStack: []error{err1},
+			Level:    log_item.LogLevelError02, CallStack: []error{err1},
 		}
 		return
 	}
@@ -89,12 +89,12 @@ func NewFileHashCreate(file_path string) (Fh *FileHash, err error) {
 	var err1 error
 	Fh.FileBasic, err1 = Create(file_path)
 	if err1 != nil {
-		err = &ftp_context.LogItem{
+		err = &log_item.LogItem{
 			Location: loc,
 			Time:     time.Now(),
 			After:    fmt.Sprintf(`Fh.FileBasic, err1 = Create("%s")`, file_path),
 			Message:  err1.Error(),
-			Err:      true, CallStack: []error{err1},
+			Level:    log_item.LogLevelError02, CallStack: []error{err1},
 		}
 		return
 	}

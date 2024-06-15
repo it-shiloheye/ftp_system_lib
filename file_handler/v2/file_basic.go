@@ -11,7 +11,7 @@ import (
 	"os"
 
 	"github.com/it-shiloheye/ftp_system_lib/base"
-	ftp_context "github.com/it-shiloheye/ftp_system_lib/context"
+	"github.com/it-shiloheye/ftp_system_lib/logging/log_item"
 )
 
 type FileType string
@@ -55,7 +55,7 @@ func (Fo *FileBasic) Type() fs.FileMode {
 func (Fo *FileBasic) ReadAll() (data []byte, err error) {
 	data, err = io.ReadAll(Fo.File)
 	if err != nil {
-		err = ftp_context.NewLogItem("FileBasic.ReadAll", true).
+		err = log_item.NewLogItem("FileBasic.ReadAll", log_item.LogLevelError01).
 			SetAfter("data, err = io.ReadAll(Fo.File)").
 			Set("path", Fo.Path).AppendParentError(err).
 			SetMessage(err.Error())
@@ -76,7 +76,7 @@ func Open(file_path string) (Fo *FileBasic, err error) {
 	}
 	Fo.File, err1 = base.OpenFile(file_path, os.O_RDWR|os.O_SYNC)
 	if err1 != nil {
-		err = ftp_context.NewLogItem(loc, true).
+		err = log_item.NewLogItem(loc, log_item.LogLevelError01).
 			SetAfter("base.OpenFile").
 			Set("path", Fo.Path).
 			SetMessagef("path: %s \nerror:\n%s", file_path, err1.Error()).
@@ -88,7 +88,7 @@ func Open(file_path string) (Fo *FileBasic, err error) {
 
 	Fo.fs, err2 = Fo.File.Stat()
 	if err2 != nil {
-		err = ftp_context.NewLogItem(loc, true).
+		err = log_item.NewLogItem(loc, log_item.LogLevelError01).
 			SetAfter("Fo.fs, err2 = Fo.File.Stat()").
 			SetMessagef("path: %s \nerror:\n%s", file_path, err2.Error()).AppendParentError(err2)
 		return
@@ -133,7 +133,7 @@ func Create(file_path string) (Fo *FileBasic, err error) {
 	}
 	Fo.File, err1 = base.OpenFile(file_path, os.O_RDWR|os.O_SYNC|os.O_CREATE)
 	if err1 != nil {
-		err = ftp_context.NewLogItem(loc, true).
+		err = log_item.NewLogItem(loc, log_item.LogLevelError01).
 			SetAfter("Fo.File, err1 = base.OpenFile(file_path, os.O_RDWR|os.O_SYNC|os.O_CREATE)").
 			SetMessagef("path: %s \nerror:\n%s", file_path, err1.Error()).
 			AppendParentError(err1)
@@ -143,7 +143,7 @@ func Create(file_path string) (Fo *FileBasic, err error) {
 
 	Fo.fs, err2 = Fo.File.Stat()
 	if err2 != nil {
-		err = ftp_context.NewLogItem(loc, true).
+		err = log_item.NewLogItem(loc, log_item.LogLevelError01).
 			SetAfter("Fo.fs, err2 = Fo.File.Stat()").
 			SetMessagef("path: %s \nerror:\n%s", file_path, err2.Error()).AppendParentError(err2)
 		return
@@ -166,7 +166,7 @@ func WriteJson(Fo *FileBasic, v any) (err error) {
 	var err1, err2 error
 	t, err1 := json.MarshalIndent(v, " ", "\t")
 	if err1 != nil {
-		err = ftp_context.NewLogItem(loc, true).
+		err = log_item.NewLogItem(loc, log_item.LogLevelError01).
 			SetAfter(`t, err1 := json.MarshalIndent(v, " ", "\t")`).
 			Set("path", Fo.Path).
 			SetMessagef("path: %s \nerror:\n%s", Fo.Path, err1.Error()).
@@ -176,7 +176,7 @@ func WriteJson(Fo *FileBasic, v any) (err error) {
 
 	_, err2 = Fo.Write(t)
 	if err2 != nil {
-		err = ftp_context.NewLogItem(loc, true).
+		err = log_item.NewLogItem(loc, log_item.LogLevelError01).
 			SetMessagef("_, err2 = Fo.Write(t)").
 			SetMessagef("path: %s \nerror:\n%s", Fo.Path, err2.Error()).
 			AppendParentError(err2)

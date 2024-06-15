@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	ftp_context "github.com/it-shiloheye/ftp_system_lib/context"
+	"github.com/it-shiloheye/ftp_system_lib/logging/log_item"
 )
 
 func main() {
@@ -182,7 +182,7 @@ func GenerateCAPem(X509_ x509.Certificate) (caPem CAPem, err error) {
 	// create our private and public key
 	caPem.PrivKey, err = rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
-		err = ftp_context.NewLogItem(loc, true).
+		err = log_item.NewLogItem(loc, log_item.LogLevelError01).
 			SetAfter("caPem.PrivKey, err = rsa.GenerateKey(rand.Reader, 4096)").
 			SetMessage(err.Error()).
 			AppendParentError(err)
@@ -192,7 +192,7 @@ func GenerateCAPem(X509_ x509.Certificate) (caPem CAPem, err error) {
 	// create the CA
 	caPem.Cert, err = x509.CreateCertificate(rand.Reader, &caPem.X509, &caPem.X509, &caPem.PrivKey.PublicKey, caPem.PrivKey)
 	if err != nil {
-		err = ftp_context.NewLogItem(loc, true).
+		err = log_item.NewLogItem(loc, log_item.LogLevelError01).
 			SetAfter("caPem.Cert, err = x509.CreateCertificate(rand.Reader, &caPem.X509, &caPem.X509, &caPem.PrivKey.PublicKey, caPem.PrivKey)").
 			SetMessage(err.Error()).
 			AppendParentError(err)
@@ -230,7 +230,7 @@ func GenerateTLSCert(ca_pem CAPem, X509_ x509.Certificate) (tls_cert TLSCert, er
 
 	tls_cert.PrivKey, err = rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
-		err = ftp_context.NewLogItem(loc, true).
+		err = log_item.NewLogItem(loc, log_item.LogLevelError01).
 			SetAfter("tls_cert.PrivKey, err = rsa.GenerateKey(rand.Reader, 4096)").
 			SetMessage(err.Error()).
 			AppendParentError(err)
@@ -240,7 +240,7 @@ func GenerateTLSCert(ca_pem CAPem, X509_ x509.Certificate) (tls_cert TLSCert, er
 	log.Println(tls_cert)
 	tls_cert.Cert, err = x509.CreateCertificate(rand.Reader, &tls_cert.X509, &ca_pem.X509, &tls_cert.PrivKey.PublicKey, ca_pem.PrivKey)
 	if err != nil {
-		err = ftp_context.NewLogItem(loc, true).
+		err = log_item.NewLogItem(loc, log_item.LogLevelError01).
 			SetAfter("tls_cert.Cert, err = x509.CreateCertificate(rand.Reader, &tls_cert.X509, &ca_pem.X509, &tls_cert.PrivKey.PublicKey, ca_pem.PrivKey)").
 			SetMessage(err.Error()).
 			AppendParentError(err)
@@ -263,7 +263,7 @@ func GenerateTLSCert(ca_pem CAPem, X509_ x509.Certificate) (tls_cert TLSCert, er
 
 	tls_cert.TlsCert, err = tls.X509KeyPair(tls_cert.PEM, tls_cert.PrivKeyPEM)
 	if err != nil {
-		err = ftp_context.NewLogItem(loc, true).
+		err = log_item.NewLogItem(loc, log_item.LogLevelError01).
 			SetAfter("tls_cert.TlsCert, err = tls.X509KeyPair(tls_cert.PEM, tls_cert.PrivKeyPEM)").
 			SetMessage(err.Error()).
 			AppendParentError(err)

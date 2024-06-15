@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"hash"
 
-	ftp_context "github.com/it-shiloheye/ftp_system_lib/context"
+	"github.com/it-shiloheye/ftp_system_lib/logging/log_item"
 )
 
 type BytesStore struct {
@@ -19,7 +19,7 @@ func (bs *BytesStore) Hash() (hash string, err error) {
 	bs.h.Reset()
 	_, err1 := bs.WriteTo(bs.h)
 	if err1 != nil {
-		err = ftp_context.NewLogItem(loc, true).
+		err = log_item.NewLogItem(loc, log_item.LogLevelError01).
 			SetAfter("_, err = bs.CopyTo(bs.h)").
 			SetMessage(err1.Error()).
 			AppendParentError(err1)

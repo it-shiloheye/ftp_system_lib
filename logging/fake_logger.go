@@ -2,6 +2,7 @@ package logging
 
 import (
 	"fmt"
+	"github.com/it-shiloheye/ftp_system_lib/logging/log_item"
 	"io"
 	"sync"
 	"sync/atomic"
@@ -9,9 +10,9 @@ import (
 )
 
 type FakeLogger struct {
-	C chan *LogItem
+	C chan *log_item.LogItem
 
-	log_level atomic.Pointer[LogLevel]
+	log_level atomic.Pointer[log_item.LogLevel]
 
 	out  io.Writer
 	lock sync.Mutex
@@ -22,26 +23,26 @@ type FakeLogger struct {
 }
 
 func (l *FakeLogger) Fatal(v ...any) {
-	tmp := &LogItem{
+	tmp := &log_item.LogItem{
 		Time:    time.Now(),
-		Level:   LogLevelFatal,
+		Level:   log_item.LogLevelFatal,
 		Message: *l.prefix.Load() + fmt.Sprint(v...),
 	}
 	l.C <- tmp
 
 }
 func (l *FakeLogger) Fatalf(format string, v ...any) {
-	tmp := &LogItem{
+	tmp := &log_item.LogItem{
 		Time:    time.Now(),
-		Level:   LogLevelFatal,
+		Level:   log_item.LogLevelFatal,
 		Message: *l.prefix.Load() + fmt.Sprint(v...),
 	}
 	l.C <- tmp
 }
 func (l *FakeLogger) Fatalln(v ...any) {
-	tmp := &LogItem{
+	tmp := &log_item.LogItem{
 		Time:    time.Now(),
-		Level:   LogLevelFatal,
+		Level:   log_item.LogLevelFatal,
 		Message: *l.prefix.Load() + fmt.Sprint(v...),
 	}
 	l.C <- tmp
@@ -53,27 +54,27 @@ func (l *FakeLogger) Output(calldepth int, s string) error {
 	return nil
 }
 func (l *FakeLogger) Panic(v ...any) {
-	tmp := &LogItem{
+	tmp := &log_item.LogItem{
 		Time:    time.Now(),
-		Level:   LogLevelError02,
+		Level:   log_item.LogLevelError02,
 		Message: *l.prefix.Load() + fmt.Sprint(v...),
 	}
 	l.C <- tmp
 	panic(tmp)
 }
 func (l *FakeLogger) Panicf(format string, v ...any) {
-	tmp := &LogItem{
+	tmp := &log_item.LogItem{
 		Time:    time.Now(),
-		Level:   LogLevelError02,
+		Level:   log_item.LogLevelError02,
 		Message: *l.prefix.Load() + fmt.Sprintf(format, v...),
 	}
 	l.C <- tmp
 	panic(tmp)
 }
 func (l *FakeLogger) Panicln(v ...any) {
-	tmp := &LogItem{
+	tmp := &log_item.LogItem{
 		Time:    time.Now(),
-		Level:   LogLevelError02,
+		Level:   log_item.LogLevelError02,
 		Message: *l.prefix.Load() + fmt.Sprint(v...),
 	}
 	l.C <- tmp
@@ -83,25 +84,25 @@ func (l *FakeLogger) Prefix() string {
 	return *l.prefix.Load()
 }
 func (l *FakeLogger) Print(v ...any) {
-	tmp := &LogItem{
+	tmp := &log_item.LogItem{
 		Time:    time.Now(),
-		Level:   LogLevelInfo01,
+		Level:   log_item.LogLevelInfo01,
 		Message: *l.prefix.Load() + fmt.Sprint(v...),
 	}
 	l.C <- tmp
 }
 func (l *FakeLogger) Printf(format string, v ...any) {
-	tmp := &LogItem{
+	tmp := &log_item.LogItem{
 		Time:    time.Now(),
-		Level:   LogLevelInfo01,
+		Level:   log_item.LogLevelInfo01,
 		Message: *l.prefix.Load() + fmt.Sprintf(format, v...),
 	}
 	l.C <- tmp
 }
 func (l *FakeLogger) Println(v ...any) {
-	tmp := &LogItem{
+	tmp := &log_item.LogItem{
 		Time:    time.Now(),
-		Level:   LogLevelInfo01,
+		Level:   log_item.LogLevelInfo01,
 		Message: *l.prefix.Load() + fmt.Sprint(v...),
 	}
 	l.C <- tmp
@@ -133,10 +134,10 @@ func (fw *FakeWriter) Write(p []byte) (n int, err error) {
 	n, err = fw.f.out.Write(p)
 	fw.f.lock.Unlock()
 
-	tmp := &LogItem{
+	tmp := &log_item.LogItem{
 		Time:    time.Now(),
 		Message: "writing: " + string(p),
-		Level:   LogLevelWrite,
+		Level:   log_item.LogLevelWrite,
 	}
 
 	if err != nil {

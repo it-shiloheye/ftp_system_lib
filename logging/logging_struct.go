@@ -14,19 +14,20 @@ import (
 	"github.com/it-shiloheye/ftp_system_lib/base"
 	ftp_context "github.com/it-shiloheye/ftp_system_lib/context"
 	"github.com/it-shiloheye/ftp_system_lib/file_handler/v2"
+	"github.com/it-shiloheye/ftp_system_lib/logging/log_item"
 )
 
 const fs_mode = fs.FileMode(base.S_IRWXU | base.S_IRWXO)
 
 var Logger = &LoggerStruct{
 
-	comm: make(chan *ftp_context.LogItem, 100),
+	comm: make(chan *log_item.LogItem, 100),
 }
 
 var lock = &sync.Mutex{}
 
 type LoggerStruct struct {
-	comm chan *ftp_context.LogItem
+	comm chan *log_item.LogItem
 }
 
 var log_file = &filehandler.FileBasic{}
@@ -47,18 +48,18 @@ func InitialiseLogging(logging_dir string) {
 
 	err1 = os.MkdirAll(logging_dir+"/log/sess", fs.FileMode(base.S_IRWXO|base.S_IRWXU))
 	if !errors.Is(err1, os.ErrExist) && err1 != nil {
-		a := &ftp_context.LogItem{
+		a := &log_item.LogItem{
 			Location: loc,
 			Time:     time.Now(),
 			Message:  err1.Error(),
-			Err:      true, CallStack: []error{err1},
+			Level:    log_item.LogLevelError02, CallStack: []error{err1},
 		}
 		log.Fatalln(a)
 	}
 
 	log_file.File, err2 = base.OpenFile(log_file_p, os.O_APPEND|os.O_RDWR|os.O_CREATE)
 	if err2 != nil {
-		b := &ftp_context.LogItem{
+		b := &log_item.LogItem{
 			Location: loc,
 			Time:     time.Now(),
 			Message:  err2.Error(),
@@ -70,11 +71,11 @@ func InitialiseLogging(logging_dir string) {
 
 	log_err_file.File, err3 = base.OpenFile(log_err_file_p, os.O_APPEND|os.O_RDWR|os.O_CREATE)
 	if err3 != nil {
-		c := &ftp_context.LogItem{
+		c := &log_item.LogItem{
 			Location:  loc,
 			Time:      time.Now(),
 			Message:   err3.Error(),
-			Err:       true,
+			Level:     log_item.LogLevelError02,
 			CallStack: []error{err3},
 		}
 		log.Fatalln(c)
@@ -82,11 +83,11 @@ func InitialiseLogging(logging_dir string) {
 
 	log_today_file, err4 = filehandler.Create(log_today_file_p)
 	if err4 != nil {
-		c := &ftp_context.LogItem{
+		c := &log_item.LogItem{
 			Location:  loc,
 			Time:      time.Now(),
 			Message:   err4.Error(),
-			Err:       true,
+			Level:     log_item.LogLevelError02,
 			CallStack: []error{err4},
 		}
 		log.Fatalln(c)
@@ -95,24 +96,24 @@ func InitialiseLogging(logging_dir string) {
 	log.Println("successfull loaded logger")
 }
 
-func (ls *LoggerStruct) Log(li *ftp_context.LogItem) {
+func (ls *LoggerStruct) Log(li *log_item.LogItem) {
 
 	ls.comm <- li
 }
 
-func (ls *LoggerStruct) Logf(loc Loc, str string, v ...any) {
-	ls.comm <- &ftp_context.LogItem{
+func (ls *LoggerStruct) Logf(loc log_item.Loc, str string, v ...any) {
+	ls.comm <- &log_item.LogItem{
 		Location: string(loc),
 		Time:     time.Now(),
 		Message:  fmt.Sprintf(str, v...),
 	}
 }
 
-func (ls *LoggerStruct) LogErr(loc Loc, err error) error {
-	e := &ftp_context.LogItem{
+func (ls *LoggerStruct) LogErr(loc log_item.Loc, err error) error {
+	e := &log_item.LogItem{
 		Location:  string(loc),
 		Time:      time.Now(),
-		Err:       true,
+		Level:     log_item.LogLevelError02,
 		Message:   err.Error(),
 		CallStack: []error{err},
 	}
@@ -129,9 +130,9 @@ func (ls *LoggerStruct) Engine(ctx ftp_context.Context, logging_dir string) {
 
 	tc := time.NewTicker(time.Second)
 
-	var li *ftp_context.LogItem
+	var li *log_item.LogItem
 
-	queue := []*ftp_context.LogItem{}
+	queue := []*log_item.LogItem{}
 
 	var txt, log_txt, err_txt string
 	int_ := 0
@@ -160,7 +161,7 @@ func (ls *LoggerStruct) Engine(ctx ftp_context.Context, logging_dir string) {
 				continue
 			}
 			log_txt = log_txt + txt
-			if li.Err {
+			if li.Level > log_item.LogLevelInfo03 {
 				err_txt = err_txt + txt
 				log.SetOutput(os.Stderr)
 				log.Print(txt)

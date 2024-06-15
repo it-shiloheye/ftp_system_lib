@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/it-shiloheye/ftp_system_lib/base"
+	"github.com/it-shiloheye/ftp_system_lib/logging/log_item"
 )
 
 type Context = *ContextStruct
@@ -174,7 +175,7 @@ func (ctx *ContextStruct) SetParent(key string, val any) error {
 	ctx.Set(key, val)
 
 	if ctx.parent_ctx == nil {
-		return NewLogItem("ctx.SetParent", true).SetMessagef("parent context is nil:\nkey: %s\nval: %v", key, val)
+		return log_item.NewLogItem("ctx.SetParent", log_item.LogLevelError01).SetMessagef("parent context is nil:\nkey: %s\nval: %v", key, val)
 	}
 	ctx.parent_ctx.SetParent(key, val)
 	return nil
