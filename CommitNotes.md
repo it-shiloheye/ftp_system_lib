@@ -1,5 +1,21 @@
 # Commit Notes
 
+### 17th June 2024, 19:33 PM GMT +3
+```sh
+1. Improving logging:
+    - moving log files into logging struct 
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch main
+# Your branch is up to date with 'origin/main'.
+#
+# Changes to be committed:
+#	modified:   logging/logging_struct.go
+#
+
+```
+
 ### 14th June 2024, 01:36 AM GMT +3
 ```sh
 1. Moving logging into ftp_system_lib 
