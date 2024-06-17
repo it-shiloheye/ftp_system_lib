@@ -21,23 +21,25 @@ const fs_mode = fs.FileMode(base.S_IRWXU | base.S_IRWXO)
 
 var Logger = &LoggerStruct{
 
-	comm: make(chan *log_item.LogItem, 100),
+	log_file:       &filehandler.FileBasic{},
+	log_err_file:   &filehandler.FileBasic{},
+	log_today_file: &filehandler.FileBasic{},
+	comm:           make(chan *log_item.LogItem, 100),
 }
 
 var lock = &sync.Mutex{}
 
 type LoggerStruct struct {
-	comm chan *log_item.LogItem
+	comm           chan *log_item.LogItem
+	log_file       *filehandler.FileBasic
+	log_err_file   *filehandler.FileBasic
+	log_today_file *filehandler.FileBasic
 }
-
-var log_file = &filehandler.FileBasic{}
-var log_err_file = &filehandler.FileBasic{}
-var log_today_file = &filehandler.FileBasic{}
 
 func InitialiseLogging(logging_dir string) {
 	log.Println("loading logger")
 
-	loc := log_item.Loc("ftp_system/client/main_thread/logging/logging_struct.go")
+	loc := log_item.Locf("ffunc InitialiseLogging(logging_dir: %s)", logging_dir)
 	log_file_p := logging_dir + "/log/log_file.txt"
 	log_err_file_p := logging_dir + "/log/log_err_file.txt"
 	log_today_file_p := logging_dir + "/log/sess/" + log_file_name() + ".txt"
@@ -57,7 +59,7 @@ func InitialiseLogging(logging_dir string) {
 		log.Fatalln(a)
 	}
 
-	log_file.File, err2 = base.OpenFile(log_file_p, os.O_APPEND|os.O_RDWR|os.O_CREATE)
+	Logger.log_file.File, err2 = base.OpenFile(log_file_p, os.O_APPEND|os.O_RDWR|os.O_CREATE)
 	if err2 != nil {
 		b := &log_item.LogItem{
 			Location: loc,
@@ -69,7 +71,7 @@ func InitialiseLogging(logging_dir string) {
 		log.Fatalln(b)
 	}
 
-	log_err_file.File, err3 = base.OpenFile(log_err_file_p, os.O_APPEND|os.O_RDWR|os.O_CREATE)
+	Logger.log_err_file.File, err3 = base.OpenFile(log_err_file_p, os.O_APPEND|os.O_RDWR|os.O_CREATE)
 	if err3 != nil {
 		c := &log_item.LogItem{
 			Location:  loc,
@@ -81,7 +83,7 @@ func InitialiseLogging(logging_dir string) {
 		log.Fatalln(c)
 	}
 
-	log_today_file, err4 = filehandler.Create(log_today_file_p)
+	Logger.log_today_file, err4 = filehandler.Create(log_today_file_p)
 	if err4 != nil {
 		c := &log_item.LogItem{
 			Location:  loc,
@@ -179,15 +181,15 @@ func (ls *LoggerStruct) Engine(ctx ftp_context.Context, logging_dir string) {
 		}
 
 		if len(log_txt) > 0 {
-			log.SetOutput(log_today_file)
+			log.SetOutput(ls.log_today_file)
 			log.Print(log_txt)
 
-			log.SetOutput(log_file)
+			log.SetOutput(ls.log_file)
 			log.Print(log_txt)
 		}
 
 		if len(err_txt) > 0 {
-			log.SetOutput(log_err_file)
+			log.SetOutput(ls.log_err_file)
 			log.Print(log_txt)
 
 		}
